@@ -10,23 +10,23 @@ $headers = @{
     "X-Cisco-Meraki-API-KEY" = $apiKey
     "Content-Type" = 'application/json'
 }
+
 cls
-if ($merakiOrganization = (Invoke-RestMethod -Method GET -Uri "$merakiUrlPrefix/organizations" -Headers $headers) | Select -ExpandProperty id) {
 
-    Write-Host "Meraki Org ID info found"
-
-} else {
-
-    Write-Host "Unable to find Meraki org data"
-
+try {
+    $orgID = Invoke-RestMethod -Method GET -Uri "$merakiUrlPrefix/organizations" -Headers $headers
+    Write-Host "Meraki Org ID is $($orgID.id)"
 }
 
-if ($merakiNetworks = Invoke-RestMethod -Method GET -Uri "$merakiUrlPrefix/organizations/$merakiOrganization/networks" -Headers $headers | foreach ($_) {Select $_.id}) {
+catch {
+    Write-Host "Unable to get org ID"
+}
 
-    Write-Host "Meraki network ID(s) info found."
+try {
+    $networkID = Invoke-RestMethod -Method GET -Uri "$merakiUrlPrefix/organizations/$($orgID.id)/networks" -Headers $headers
+    Write-Host "Meraki network ID<s> are $($networkID.id)"
+}
 
-} else {
-
-    Write-Host "Unable to find Meraki network data"
-
+catch {
+    Write-Host "Unable to get network ID<s>"
 }
